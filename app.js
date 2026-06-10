@@ -115,10 +115,21 @@ async function createMailbox() {
     method: "POST",
     body: { address, password },
   });
-  const tok = await api("/token", {
-    method: "POST",
-    body: { address, password },
-  });
+  // A freshly created account isn't always ready for /token immediately
+  // (brief 401 while it propagates) — retry a few times before giving up.
+  let tok;
+  for (let i = 0; ; i++) {
+    try {
+      tok = await api("/token", {
+        method: "POST",
+        body: { address, password },
+      });
+      break;
+    } catch (e) {
+      if (e.status !== 401 || i >= 3) throw e;
+      await sleep(500 * (i + 1));
+    }
+  }
   const now = Date.now();
   session = {
     address,
