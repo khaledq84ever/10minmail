@@ -68,10 +68,13 @@ async function api(path, { method = "GET", body, token, retries = 3 } = {}) {
     }
     if (res.status === 204) return null;
     const data = await res.json().catch(() => ({}));
-    if (!res.ok)
-      throw new Error(
+    if (!res.ok) {
+      const err = new Error(
         data["hydra:description"] || data.detail || res.statusText,
       );
+      err.status = res.status;
+      throw err;
+    }
     return data;
   }
 }
@@ -132,6 +135,19 @@ async function createMailbox() {
   expired = false;
   render();
   renderInbox();
+}
+
+/* mail.tm tokens can expire during a long (extended) session; re-mint one from
+   the stored credentials so polling/reading keeps working without a new box. */
+async function reauth() {
+  if (!session) return null;
+  const tok = await api("/token", {
+    method: "POST",
+    body: { address: session.address, password: session.password },
+  });
+  session.token = tok.token;
+  save();
+  return tok.token;
 }
 
 async function deleteMailbox(s) {
@@ -196,7 +212,14 @@ async function actCopy() {
 async function poll() {
   if (!session || expired) return;
   try {
-    const d = await api("/messages?page=1", { token: session.token });
+    let d;
+    try {
+      d = await api("/messages?page=1", { token: session.token });
+    } catch (e) {
+      if (e.status !== 401) throw e;
+      await reauth(); // token expired mid-session — refresh and retry once
+      d = await api("/messages?page=1", { token: session.token });
+    }
     const list = d["hydra:member"] || [];
     const fresh = list.some((m) => !seen.has(m.id));
     messages = list;
@@ -204,7 +227,7 @@ async function poll() {
     list.forEach((m) => seen.add(m.id));
     renderInbox();
   } catch (e) {
-    /* token may briefly 401 right after create; ignore */
+    /* token may briefly 401 right after create; next poll retries */
   }
 }
 
@@ -214,7 +237,14 @@ async function openMessage(id) {
   el.reader.innerHTML = `<div class="text-slate-500 text-sm">Loading…</div>`;
   renderInbox();
   try {
-    const m = await api(`/messages/${id}`, { token: session.token });
+    let m;
+    try {
+      m = await api(`/messages/${id}`, { token: session.token });
+    } catch (e) {
+      if (e.status !== 401) throw e;
+      await reauth();
+      m = await api(`/messages/${id}`, { token: session.token });
+    }
     await api(`/messages/${id}`, {
       method: "PATCH",
       token: session.token,
