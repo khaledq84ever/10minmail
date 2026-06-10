@@ -33,6 +33,14 @@ railway domain      # prints the public URL
 ```
 Static serving is done by `serve` (see `package.json` start script, binds `$PORT`).
 
+## Resilience
+- API calls retry on `429`/`5xx`/network errors with exponential back-off (honouring
+  `Retry-After`), so mail.tm's rate limit doesn't surface as a hard failure.
+- If the session token expires mid-session, the client re-mints one from the stored
+  credentials and retries — polling and reading keep working without a new address.
+- A fresh account's first `/token` 401 race is retried; **New address** ignores rapid
+  double-clicks and restores the current address if creation fails.
+
 ## Notes / limits
 - mail.tm is a shared free service with rate limits (~8 req/s) and its own retention —
   fine for throwaway signups, **never for sensitive accounts**.
