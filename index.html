@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>10MinMail — disposable temporary email</title>
+    <meta
+      name="description"
+      content="Get a free temporary email address that lasts 10 minutes. Receive real emails, register anywhere, no signup."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✉️</text></svg>"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "system-ui", "sans-serif"],
+              mono: ['"JetBrains Mono"', "monospace"],
+            },
+            colors: {
+              ink: "#0a0e1a",
+              panel: "#11162a",
+              edge: "#1e2540",
+              accent: "#6366f1",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      html,
+      body {
+        background: #0a0e1a;
+      }
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #2a3357;
+        border-radius: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .glow {
+        box-shadow:
+          0 0 0 1px rgba(99, 102, 241, 0.25),
+          0 12px 40px -12px rgba(99, 102, 241, 0.45);
+      }
+      @keyframes ping-in {
+        0% {
+          transform: scale(0.9);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .ping-in {
+        animation: ping-in 0.25s ease-out;
+      }
+      .grad {
+        background: radial-gradient(
+          1200px 600px at 50% -10%,
+          rgba(99, 102, 241, 0.18),
+          transparent 60%
+        );
+      }
+    </style>
+  </head>
+  <body class="grad min-h-screen text-slate-200 font-sans antialiased">
+    <div class="max-w-5xl mx-auto px-4 py-6 sm:py-10">
+      <!-- Header -->
+      <header class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-2.5">
+          <div
+            class="h-9 w-9 rounded-xl bg-accent/20 grid place-items-center text-lg"
+          >
+            ✉️
+          </div>
+          <div>
+            <h1
+              class="text-lg font-bold tracking-tight text-white leading-none"
+            >
+              10MinMail
+            </h1>
+            <p class="text-[11px] text-slate-400 mt-0.5">
+              Disposable email · no signup
+            </p>
+          </div>
+        </div>
+        <a
+          href="https://github.com"
+          class="text-xs text-slate-400 hover:text-slate-200 transition hidden sm:block"
+          >Privacy: addresses & mail auto-delete on expiry</a
+        >
+      </header>
+
+      <!-- Address card -->
+      <section
+        class="rounded-2xl bg-panel border border-edge glow p-5 sm:p-6 mb-5"
+      >
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div class="flex-1 min-w-0">
+            <p
+              class="text-[11px] uppercase tracking-wider text-slate-400 mb-1.5"
+            >
+              Your temporary address
+            </p>
+            <div class="flex items-center gap-2">
+              <code
+                id="address"
+                class="font-mono text-base sm:text-xl font-bold text-white truncate select-all"
+                >generating…</code
+              >
+              <button
+                id="copyBtn"
+                title="Copy"
+                class="shrink-0 h-9 w-9 grid place-items-center rounded-lg bg-edge hover:bg-accent/30 transition text-slate-300 hover:text-white"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="9" y="9" width="13" height="13" rx="2" />
+                  <path
+                    d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Timer -->
+          <div class="flex items-center gap-4">
+            <div class="text-right">
+              <p
+                class="text-[11px] uppercase tracking-wider text-slate-400 mb-1.5"
+              >
+                Expires in
+              </p>
+              <div
+                id="timer"
+                class="font-mono text-2xl sm:text-3xl font-bold text-emerald-400 tabular-nums leading-none"
+              >
+                10:00
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-wrap gap-2 mt-5">
+          <button
+            id="extendBtn"
+            class="px-3.5 py-2 rounded-lg bg-accent hover:bg-indigo-500 text-white text-sm font-medium transition flex items-center gap-1.5"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+              <path d="M3 3v5h5" />
+            </svg>
+            Extend +10 min
+          </button>
+          <button
+            id="newBtn"
+            class="px-3.5 py-2 rounded-lg bg-edge hover:bg-slate-700 text-slate-200 text-sm font-medium transition flex items-center gap-1.5"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            New address
+          </button>
+          <button
+            id="refreshBtn"
+            class="px-3.5 py-2 rounded-lg bg-edge hover:bg-slate-700 text-slate-200 text-sm font-medium transition flex items-center gap-1.5"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
+              <path d="M21 3v5h-5" />
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </section>
+
+      <!-- Inbox -->
+      <section class="rounded-2xl bg-panel border border-edge overflow-hidden">
+        <div
+          class="flex items-center justify-between px-5 py-3 border-b border-edge"
+        >
+          <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+            Inbox
+            <span
+              id="count"
+              class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-edge text-slate-300"
+              >0</span
+            >
+          </h2>
+          <span
+            id="poll"
+            class="text-[11px] text-slate-500 flex items-center gap-1.5"
+          >
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+            auto-refreshing
+          </span>
+        </div>
+
+        <!-- list + reader -->
+        <div class="grid md:grid-cols-[minmax(0,360px)_1fr] min-h-[360px]">
+          <ul
+            id="list"
+            class="divide-y divide-edge md:border-r border-edge max-h-[60vh] overflow-y-auto"
+          ></ul>
+          <div id="reader" class="hidden md:block p-5 text-slate-400"></div>
+        </div>
+
+        <!-- empty state -->
+        <div id="empty" class="px-6 py-16 text-center">
+          <div class="text-4xl mb-3">📭</div>
+          <p class="text-slate-300 font-medium">Waiting for emails…</p>
+          <p class="text-slate-500 text-sm mt-1">
+            Use the address above to sign up anywhere. New mail appears here
+            automatically.
+          </p>
+        </div>
+      </section>
+
+      <p class="text-center text-[11px] text-slate-600 mt-6">
+        Mail backend by mail.tm · for testing & throwaway signups only — never
+        use for sensitive accounts.
+      </p>
+    </div>
+
+    <!-- toast -->
+    <div
+      id="toast"
+      class="fixed bottom-5 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg bg-white text-slate-900 text-sm font-medium shadow-lg opacity-0 pointer-events-none transition-opacity"
+    ></div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
