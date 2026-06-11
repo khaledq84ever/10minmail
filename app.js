@@ -7,6 +7,7 @@ const LIFETIME = 10 * 60 * 1000; // 10 minutes per cycle
 const MAX_LIFETIME = 60 * 60 * 1000; // hard cap: 60 minutes total
 const POLL_MS = 5000;
 const STORE_KEY = "tenminmail.session";
+const STORE_MSGS = "tenminmail.inbox";
 
 const $ = (id) => document.getElementById(id);
 const el = {
@@ -94,6 +95,17 @@ function toast(msg) {
 function save() {
   localStorage.setItem(STORE_KEY, JSON.stringify(session));
 }
+// Cache the inbox (tied to the current address) so a page refresh shows the
+// existing mail instantly instead of flashing the empty state until the first poll.
+function saveMsgs() {
+  if (!session) return;
+  try {
+    localStorage.setItem(
+      STORE_MSGS,
+      JSON.stringify({ a: session.address, m: messages, s: [...seen] }),
+    );
+  } catch {}
+}
 function load() {
   try {
     return JSON.parse(localStorage.getItem(STORE_KEY));
@@ -147,6 +159,7 @@ async function createMailbox() {
   save();
   messages = [];
   seen = new Set();
+  localStorage.removeItem(STORE_MSGS); // fresh box → drop the old inbox cache
   openId = null;
   expired = false;
   // Clear any leftover "expired" message from a previous cycle's empty state.
@@ -187,6 +200,14 @@ async function resume() {
     session.createdAt = Date.now();
     session.expiresAt = Date.now() + LIFETIME;
   }
+  // Restore the cached inbox for THIS address so mail shows instantly on refresh.
+  try {
+    const c = JSON.parse(localStorage.getItem(STORE_MSGS));
+    if (c && c.a === session.address) {
+      messages = c.m || [];
+      seen = new Set(c.s || []);
+    }
+  } catch {}
   render();
   renderInbox();
   try {
@@ -266,6 +287,7 @@ async function poll() {
     if (fresh && seen.size > 0) toast("📬 New email received");
     list.forEach((m) => seen.add(m.id));
     renderInbox();
+    saveMsgs();
   } catch (e) {
     /* token may briefly 401 right after create; next poll retries */
   }
@@ -414,6 +436,7 @@ async function onExpire() {
   const old = session;
   await deleteMailbox(old);
   localStorage.removeItem(STORE_KEY);
+  localStorage.removeItem(STORE_MSGS);
 }
 
 function startPolling() {
