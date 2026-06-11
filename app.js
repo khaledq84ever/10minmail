@@ -270,6 +270,7 @@ async function actCopy() {
 }
 
 /* ---------- inbox ---------- */
+let pollFails = 0;
 async function poll() {
   if (!session || expired) return;
   try {
@@ -288,8 +289,16 @@ async function poll() {
     list.forEach((m) => seen.add(m.id));
     renderInbox();
     saveMsgs();
+    if (pollFails) {
+      pollFails = 0; // recovered — back to the normal live indicator
+      setPollStatus("live");
+    }
   } catch (e) {
-    /* token may briefly 401 right after create; next poll retries */
+    // api() already retried transient 429/5xx; a throw here means we're
+    // genuinely offline (or the token briefly 401s right after create, which
+    // the next poll retries). After a couple of misses, stop pretending we're
+    // live and show a "reconnecting" state so the user isn't misled.
+    if (++pollFails >= 2) setPollStatus("retry");
   }
 }
 
@@ -448,9 +457,22 @@ async function onExpire() {
   localStorage.removeItem(STORE_MSGS);
 }
 
+// The little inbox status pill: green "auto-refreshing" when polling is healthy,
+// amber "reconnecting…" once polls start failing. (onExpire paints its own red
+// "expired" state, so never override that.)
+function setPollStatus(state) {
+  if (expired) return;
+  const [dot, label] =
+    state === "retry"
+      ? ["bg-amber-400", "reconnecting…"]
+      : ["bg-emerald-400", "auto-refreshing"];
+  el.poll.innerHTML = `<span class="h-1.5 w-1.5 rounded-full ${dot}"></span> ${label}`;
+}
+
 function startPolling() {
   clearInterval(pollTimer);
-  el.poll.innerHTML = `<span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> auto-refreshing`;
+  pollFails = 0;
+  setPollStatus("live");
   poll();
   pollTimer = setInterval(poll, POLL_MS);
 }
