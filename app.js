@@ -228,26 +228,29 @@ async function actNew() {
   try {
     await createMailbox();
     await deleteMailbox(old);
-    toast("New Address Ready");
+    toast("New Email Ready");
     startPolling();
   } catch (e) {
     el.address.textContent = prev; // keep current address usable on failure
-    toast("Couldn't Get A New Address: " + e.message);
+    toast("Couldn't Get A New Email: " + e.message);
   } finally {
     creating = false;
   }
 }
 
-/* Refresh: reload the inbox AND renew the countdown to a fresh 10:00
-   (still bounded by the 60-min hard cap), then repaint the timer instantly. */
+/* Refresh: reload the inbox AND add +10 min to the remaining time (so the
+   mailbox can run past its first 10 minutes), still bounded by the 60-min
+   hard cap, then repaint the timer instantly. */
 function actRefresh() {
   if (!session || expired) return;
   const cap = session.createdAt + MAX_LIFETIME;
-  session.expiresAt = Math.min(Date.now() + LIFETIME, cap);
+  session.expiresAt = Math.min(session.expiresAt + LIFETIME, cap);
   save();
   tick();
   poll();
-  toast("Refreshed");
+  toast(
+    session.expiresAt >= cap ? "Reached 60-Min Max" : "+10 Min · Refreshed",
+  );
 }
 
 async function actCopy() {
