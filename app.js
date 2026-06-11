@@ -24,6 +24,10 @@ const el = {
   poll: $("poll"),
 };
 
+// The inbox empty-state markup as shipped in index.html. onExpire() overwrites
+// it with an "expired" message, so we keep the original to restore on a fresh box.
+const DEFAULT_EMPTY_HTML = el.empty.innerHTML;
+
 let session = null; // {address, password, id, token, createdAt, expiresAt}
 let messages = []; // cached list
 let seen = new Set(); // ids we've already shown (for "new mail" detection)
@@ -144,6 +148,8 @@ async function createMailbox() {
   seen = new Set();
   openId = null;
   expired = false;
+  // Clear any leftover "expired" message from a previous cycle's empty state.
+  el.empty.innerHTML = DEFAULT_EMPTY_HTML;
   render();
   renderInbox();
 }
@@ -345,7 +351,7 @@ function tick() {
     s = Math.floor((left % 60000) / 1000);
   el.timer.textContent = `${m}:${String(s).padStart(2, "0")}`;
   el.timer.className =
-    "font-mono text-2xl sm:text-3xl font-bold tabular-nums leading-none " +
+    "font-mono text-3xl sm:text-4xl font-extrabold tabular-nums leading-none " +
     (left < 30000
       ? "text-rose-400"
       : left < 120000
@@ -357,7 +363,8 @@ async function onExpire() {
   if (expired) return;
   expired = true;
   el.timer.textContent = "0:00";
-  el.timer.className = "font-mono text-2xl sm:text-3xl font-bold text-rose-500";
+  el.timer.className =
+    "font-mono text-3xl sm:text-4xl font-extrabold text-rose-500 tabular-nums leading-none";
   clearInterval(pollTimer);
   el.poll.innerHTML = `<span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span> expired`;
   el.list.innerHTML = "";
