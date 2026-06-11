@@ -14,7 +14,6 @@ const el = {
   address: $("address"),
   timer: $("timer"),
   copy: $("copyBtn"),
-  extend: $("extendBtn"),
   new: $("newBtn"),
   refresh: $("refreshBtn"),
   box: $("box"),
@@ -237,15 +236,6 @@ async function actNew() {
   } finally {
     creating = false;
   }
-}
-
-function actExtend() {
-  if (!session || expired) return;
-  const cap = session.createdAt + MAX_LIFETIME;
-  session.expiresAt = Math.min(Date.now() + LIFETIME, cap);
-  save();
-  tick();
-  toast(session.expiresAt >= cap ? "Reached 60-Min Max" : "Extended +10 Min");
 }
 
 /* Refresh: reload the inbox AND renew the countdown to a fresh 10:00
@@ -498,7 +488,6 @@ document.addEventListener("visibilitychange", () => {
 /* ---------- wire up ---------- */
 el.copy.addEventListener("click", actCopy);
 el.address.addEventListener("click", actCopy);
-el.extend.addEventListener("click", actExtend);
 el.new.addEventListener("click", actNew);
 el.refresh.addEventListener("click", actRefresh);
 
