@@ -54,8 +54,25 @@
       }
       .glow {
         box-shadow:
-          0 0 0 1px rgba(99, 102, 241, 0.25),
-          0 12px 40px -12px rgba(99, 102, 241, 0.45);
+          0 0 0 1px rgba(99, 102, 241, 0.35),
+          0 24px 70px -20px rgba(99, 102, 241, 0.55),
+          inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      }
+      .card-shadow {
+        box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.7);
+      }
+      .text-grad {
+        background: linear-gradient(135deg, #a5b4fc, #6366f1 45%, #c084fc);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .btn-accent {
+        background: linear-gradient(135deg, #6366f1, #7c3aed);
+        box-shadow: 0 10px 28px -8px rgba(99, 102, 241, 0.7);
+      }
+      .btn-accent:hover {
+        box-shadow: 0 12px 32px -6px rgba(124, 58, 237, 0.85);
       }
       @keyframes ping-in {
         0% {
@@ -83,19 +100,19 @@
     <div class="max-w-5xl mx-auto px-4 py-6 sm:py-10">
       <!-- Header -->
       <header class="flex items-center justify-between mb-8">
-        <div class="flex items-center gap-2.5">
+        <div class="flex items-center gap-3">
           <div
-            class="h-9 w-9 rounded-xl bg-accent/20 grid place-items-center text-lg"
+            class="h-11 w-11 rounded-2xl btn-accent grid place-items-center text-xl shadow-lg"
           >
             ✉️
           </div>
           <div>
             <h1
-              class="text-lg font-bold tracking-tight text-white leading-none"
+              class="text-2xl font-extrabold tracking-tight text-grad leading-none"
             >
               10MinMail
             </h1>
-            <p class="text-[11px] text-slate-400 mt-0.5">
+            <p class="text-xs text-slate-400 mt-1 font-medium">
               Disposable email · no signup
             </p>
           </div>
@@ -109,19 +126,19 @@
 
       <!-- Address card -->
       <section
-        class="rounded-2xl bg-panel border border-edge glow p-5 sm:p-6 mb-5"
+        class="rounded-2xl bg-panel border border-edge glow p-6 sm:p-7 mb-5"
       >
         <div class="flex flex-col sm:flex-row sm:items-center gap-4">
           <div class="flex-1 min-w-0">
             <p
-              class="text-[11px] uppercase tracking-wider text-slate-400 mb-1.5"
+              class="text-[11px] uppercase tracking-widest font-semibold text-accent mb-2"
             >
               Your temporary address
             </p>
             <div class="flex items-center gap-2">
               <code
                 id="address"
-                class="font-mono text-base sm:text-xl font-bold text-white truncate select-all"
+                class="font-mono text-lg sm:text-2xl font-bold text-white truncate select-all"
                 >generating…</code
               >
               <button
@@ -153,13 +170,13 @@
           <div class="flex items-center gap-4">
             <div class="text-right">
               <p
-                class="text-[11px] uppercase tracking-wider text-slate-400 mb-1.5"
+                class="text-[11px] uppercase tracking-widest font-semibold text-slate-400 mb-1.5"
               >
                 Expires in
               </p>
               <div
                 id="timer"
-                class="font-mono text-2xl sm:text-3xl font-bold text-emerald-400 tabular-nums leading-none"
+                class="font-mono text-3xl sm:text-4xl font-extrabold text-emerald-400 tabular-nums leading-none drop-shadow-[0_2px_12px_rgba(52,211,153,0.4)]"
               >
                 10:00
               </div>
@@ -171,7 +188,7 @@
         <div class="flex flex-wrap gap-2 mt-5">
           <button
             id="extendBtn"
-            class="px-3.5 py-2 rounded-lg bg-accent hover:bg-indigo-500 text-white text-sm font-medium transition flex items-center gap-1.5"
+            class="px-4 py-2.5 rounded-xl btn-accent text-white text-sm font-bold transition hover:-translate-y-0.5 flex items-center gap-1.5"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -191,7 +208,7 @@
           </button>
           <button
             id="newBtn"
-            class="px-3.5 py-2 rounded-lg bg-edge hover:bg-slate-700 text-slate-200 text-sm font-medium transition flex items-center gap-1.5"
+            class="px-4 py-2.5 rounded-xl bg-edge hover:bg-slate-700 text-slate-100 text-sm font-bold transition hover:-translate-y-0.5 shadow-lg shadow-black/30 flex items-center gap-1.5"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -210,7 +227,7 @@
           </button>
           <button
             id="refreshBtn"
-            class="px-3.5 py-2 rounded-lg bg-edge hover:bg-slate-700 text-slate-200 text-sm font-medium transition flex items-center gap-1.5"
+            class="px-4 py-2.5 rounded-xl bg-edge hover:bg-slate-700 text-slate-100 text-sm font-bold transition hover:-translate-y-0.5 shadow-lg shadow-black/30 flex items-center gap-1.5"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -232,15 +249,17 @@
       </section>
 
       <!-- Inbox -->
-      <section class="rounded-2xl bg-panel border border-edge overflow-hidden">
+      <section
+        class="rounded-2xl bg-panel border border-edge overflow-hidden card-shadow"
+      >
         <div
           class="flex items-center justify-between px-5 py-3 border-b border-edge"
         >
-          <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
             Inbox
             <span
               id="count"
-              class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-edge text-slate-300"
+              class="text-[11px] font-bold px-2 py-0.5 rounded-full btn-accent text-white"
               >0</span
             >
           </h2>
@@ -264,9 +283,9 @@
 
         <!-- empty state -->
         <div id="empty" class="px-6 py-16 text-center">
-          <div class="text-4xl mb-3">📭</div>
-          <p class="text-slate-300 font-medium">Waiting for emails…</p>
-          <p class="text-slate-500 text-sm mt-1">
+          <div class="text-5xl mb-3">📭</div>
+          <p class="text-slate-200 font-bold text-lg">Waiting for emails…</p>
+          <p class="text-slate-500 text-sm mt-1.5">
             Use the address above to sign up anywhere. New mail appears here
             automatically.
           </p>
@@ -276,6 +295,16 @@
       <p class="text-center text-[11px] text-slate-600 mt-6">
         Mail backend by mail.tm · for testing & throwaway signups only — never
         use for sensitive accounts.
+      </p>
+      <p class="text-center text-[11px] text-slate-500 mt-2">
+        Program by
+        <a
+          href="https://x.com/KhaledQ84Ever"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-accent hover:text-indigo-400 font-medium transition"
+          >@KhaledQ84Ever</a
+        >
       </p>
     </div>
 
