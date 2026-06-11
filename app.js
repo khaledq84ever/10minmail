@@ -176,15 +176,24 @@ async function deleteMailbox(s) {
 
 async function resume() {
   const s = load();
-  if (s && s.expiresAt > Date.now()) {
-    session = s;
-    expired = false;
-    render();
-    renderInbox();
-    return;
+  if (!s) return createMailbox();
+  session = s;
+  expired = false;
+  // A page refresh must NEVER lose the mailbox. If the 10-min timer lapsed while
+  // the page was closed, renew it (keeping the SAME address) instead of wiping
+  // it — mail.tm accounts only disappear when we delete them ourselves.
+  if (session.expiresAt <= Date.now()) {
+    session.createdAt = Date.now();
+    session.expiresAt = Date.now() + LIFETIME;
   }
-  if (s) await deleteMailbox(s); // stale — clean up
-  await createMailbox();
+  render();
+  renderInbox();
+  try {
+    await reauth(); // re-mint the token; the stored one may have expired
+  } catch (e) {
+    if (e.status === 401) return createMailbox(); // account truly gone server-side
+    // network/other blip: keep the restored mailbox; polling will retry
+  }
 }
 
 /* ---------- actions ---------- */
@@ -213,7 +222,20 @@ function actExtend() {
   const cap = session.createdAt + MAX_LIFETIME;
   session.expiresAt = Math.min(Date.now() + LIFETIME, cap);
   save();
+  tick();
   toast(session.expiresAt >= cap ? "Reached 60-min max" : "Extended +10 min");
+}
+
+/* Refresh: reload the inbox AND renew the countdown to a fresh 10:00
+   (still bounded by the 60-min hard cap), then repaint the timer instantly. */
+function actRefresh() {
+  if (!session || expired) return;
+  const cap = session.createdAt + MAX_LIFETIME;
+  session.expiresAt = Math.min(Date.now() + LIFETIME, cap);
+  save();
+  tick();
+  poll();
+  toast("Refreshed");
 }
 
 async function actCopy() {
@@ -278,10 +300,19 @@ async function openMessage(id) {
       </div>`;
     if (bodyHtml) {
       const frame = document.createElement("iframe");
-      frame.setAttribute("sandbox", "");
+      // Keep scripts disabled, but let the user actually USE verification links:
+      // allow-popups lets links open, allow-popups-to-escape-sandbox means the
+      // opened page (the real verify URL) isn't itself sandboxed.
+      frame.setAttribute(
+        "sandbox",
+        "allow-popups allow-popups-to-escape-sandbox",
+      );
       frame.className = "w-full rounded-lg bg-white";
       frame.style.height = "55vh";
-      frame.srcdoc = bodyHtml;
+      // Force every link to open in a new tab so a click escapes the iframe
+      // instead of trying (and failing) to navigate inside the sandbox.
+      frame.srcdoc =
+        `<base target="_blank" rel="noopener noreferrer">` + bodyHtml;
       el.reader.appendChild(frame);
     } else {
       const pre = document.createElement("pre");
@@ -351,7 +382,7 @@ function tick() {
     s = Math.floor((left % 60000) / 1000);
   el.timer.textContent = `${m}:${String(s).padStart(2, "0")}`;
   el.timer.className =
-    "font-mono text-3xl sm:text-4xl font-extrabold tabular-nums leading-none " +
+    "font-mono text-2xl sm:text-3xl font-extrabold tabular-nums leading-none " +
     (left < 30000
       ? "text-rose-400"
       : left < 120000
@@ -364,7 +395,7 @@ async function onExpire() {
   expired = true;
   el.timer.textContent = "0:00";
   el.timer.className =
-    "font-mono text-3xl sm:text-4xl font-extrabold text-rose-500 tabular-nums leading-none";
+    "font-mono text-2xl sm:text-3xl font-extrabold text-rose-500 tabular-nums leading-none";
   clearInterval(pollTimer);
   el.poll.innerHTML = `<span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span> expired`;
   el.list.innerHTML = "";
@@ -392,10 +423,7 @@ el.copy.addEventListener("click", actCopy);
 el.address.addEventListener("click", actCopy);
 el.extend.addEventListener("click", actExtend);
 el.new.addEventListener("click", actNew);
-el.refresh.addEventListener("click", () => {
-  poll();
-  toast("Refreshed");
-});
+el.refresh.addEventListener("click", actRefresh);
 
 (async function main() {
   tickTimer = setInterval(tick, 1000);

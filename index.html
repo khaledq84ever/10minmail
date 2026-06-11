@@ -97,18 +97,18 @@
     </style>
   </head>
   <body class="grad min-h-screen text-slate-200 font-sans antialiased">
-    <div class="max-w-5xl mx-auto px-4 py-6 sm:py-10">
+    <div class="max-w-3xl mx-auto px-4 py-5 sm:py-7">
       <!-- Header -->
-      <header class="flex items-center justify-between mb-8">
-        <div class="flex items-center gap-3">
+      <header class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-2.5">
           <div
-            class="h-11 w-11 rounded-2xl btn-accent grid place-items-center text-xl shadow-lg"
+            class="h-9 w-9 rounded-xl btn-accent grid place-items-center text-lg shadow-lg"
           >
             ✉️
           </div>
           <div>
             <h1
-              class="text-2xl font-extrabold tracking-tight text-grad leading-none"
+              class="text-xl font-extrabold tracking-tight text-grad leading-none"
             >
               10MinMail
             </h1>
@@ -125,9 +125,7 @@
       </header>
 
       <!-- Address card -->
-      <section
-        class="rounded-2xl bg-panel border border-edge glow p-6 sm:p-7 mb-5"
-      >
+      <section class="rounded-2xl bg-panel border border-edge glow p-5 mb-4">
         <div class="flex flex-col sm:flex-row sm:items-center gap-4">
           <div class="flex-1 min-w-0">
             <p
@@ -138,7 +136,7 @@
             <div class="flex items-center gap-2">
               <code
                 id="address"
-                class="font-mono text-lg sm:text-2xl font-bold text-white truncate select-all"
+                class="font-mono text-base sm:text-xl font-bold text-white truncate select-all"
                 >generating…</code
               >
               <button
@@ -176,7 +174,7 @@
               </p>
               <div
                 id="timer"
-                class="font-mono text-3xl sm:text-4xl font-extrabold text-emerald-400 tabular-nums leading-none drop-shadow-[0_2px_12px_rgba(52,211,153,0.4)]"
+                class="font-mono text-2xl sm:text-3xl font-extrabold text-emerald-400 tabular-nums leading-none drop-shadow-[0_2px_12px_rgba(52,211,153,0.4)]"
               >
                 10:00
               </div>
@@ -253,19 +251,19 @@
         class="rounded-2xl bg-panel border border-edge overflow-hidden card-shadow"
       >
         <div
-          class="flex items-center justify-between px-5 py-3 border-b border-edge"
+          class="flex items-center justify-between px-4 py-2.5 border-b border-edge"
         >
-          <h2 class="text-base font-bold text-white flex items-center gap-2">
+          <h2 class="text-sm font-bold text-white flex items-center gap-2">
             Inbox
             <span
               id="count"
-              class="text-[11px] font-bold px-2 py-0.5 rounded-full btn-accent text-white"
+              class="text-[10px] font-bold px-1.5 py-0.5 rounded-full btn-accent text-white"
               >0</span
             >
           </h2>
           <span
             id="poll"
-            class="text-[11px] text-slate-500 flex items-center gap-1.5"
+            class="text-[10px] text-slate-500 flex items-center gap-1.5"
           >
             <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
             auto-refreshing
@@ -273,21 +271,22 @@
         </div>
 
         <!-- list + reader -->
-        <div class="grid md:grid-cols-[minmax(0,360px)_1fr] min-h-[360px]">
+        <div class="grid md:grid-cols-[minmax(0,300px)_1fr] min-h-[140px]">
           <ul
             id="list"
-            class="divide-y divide-edge md:border-r border-edge max-h-[60vh] overflow-y-auto"
+            class="divide-y divide-edge md:border-r border-edge max-h-[45vh] overflow-y-auto"
           ></ul>
-          <div id="reader" class="hidden md:block p-5 text-slate-400"></div>
+          <div id="reader" class="hidden md:block p-4 text-slate-400"></div>
         </div>
 
         <!-- empty state -->
-        <div id="empty" class="px-6 py-16 text-center">
-          <div class="text-5xl mb-3">📭</div>
-          <p class="text-slate-200 font-bold text-lg">Waiting for emails…</p>
-          <p class="text-slate-500 text-sm mt-1.5">
-            Use the address above to sign up anywhere. New mail appears here
-            automatically.
+        <div id="empty" class="px-4 py-6 text-center">
+          <div class="text-2xl mb-1.5">📭</div>
+          <p class="text-slate-200 font-semibold text-sm">
+            Waiting for emails…
+          </p>
+          <p class="text-slate-500 text-xs mt-1">
+            Use the address above to sign up anywhere.
           </p>
         </div>
       </section>
