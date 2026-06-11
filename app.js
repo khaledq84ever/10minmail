@@ -225,15 +225,15 @@ async function actNew() {
   creating = true;
   const old = session;
   const prev = el.address.textContent;
-  el.address.textContent = "generating…";
+  el.address.textContent = "Generating…";
   try {
     await createMailbox();
     await deleteMailbox(old);
-    toast("New address ready");
+    toast("New Address Ready");
     startPolling();
   } catch (e) {
     el.address.textContent = prev; // keep current address usable on failure
-    toast("Couldn't get a new address: " + e.message);
+    toast("Couldn't Get A New Address: " + e.message);
   } finally {
     creating = false;
   }
@@ -245,7 +245,7 @@ function actExtend() {
   session.expiresAt = Math.min(Date.now() + LIFETIME, cap);
   save();
   tick();
-  toast(session.expiresAt >= cap ? "Reached 60-min max" : "Extended +10 min");
+  toast(session.expiresAt >= cap ? "Reached 60-Min Max" : "Extended +10 Min");
 }
 
 /* Refresh: reload the inbox AND renew the countdown to a fresh 10:00
@@ -263,9 +263,9 @@ function actRefresh() {
 async function actCopy() {
   try {
     await navigator.clipboard.writeText(session.address);
-    toast("Address copied");
+    toast("Address Copied");
   } catch {
-    toast("Copy failed");
+    toast("Copy Failed");
   }
 }
 
@@ -285,7 +285,7 @@ async function poll() {
     const list = d["hydra:member"] || [];
     const fresh = list.some((m) => !seen.has(m.id));
     messages = list;
-    if (fresh && seen.size > 0) toast("📬 New email received");
+    if (fresh && seen.size > 0) toast("📬 New Email Received");
     list.forEach((m) => seen.add(m.id));
     renderInbox();
     saveMsgs();
@@ -332,7 +332,7 @@ async function openMessage(id) {
     el.reader.innerHTML = `
       <div class="mb-4">
         <h3 class="text-white font-semibold text-base mb-1 break-words">${esc(m.subject || "(no subject)")}</h3>
-        <div class="text-sm text-slate-400 break-words">from <span class="text-slate-200">${esc(from)}</span></div>
+        <div class="text-sm text-slate-400 break-words">From <span class="text-slate-200 font-semibold">${esc(from)}</span></div>
         <div class="text-xs text-slate-500 mt-0.5">${date}</div>
       </div>`;
     if (bodyHtml) {
@@ -359,7 +359,7 @@ async function openMessage(id) {
       el.reader.appendChild(pre);
     }
   } catch (e) {
-    el.reader.innerHTML = `<div class="text-rose-400 text-sm">Could not load message: ${esc(e.message)}</div>`;
+    el.reader.innerHTML = `<div class="text-rose-400 text-sm">Could Not Load Message: ${esc(e.message)}</div>`;
   }
 }
 
@@ -380,7 +380,7 @@ function renderInbox() {
   el.empty.style.display = messages.length ? "none" : "block";
   // Fill the otherwise-blank desktop reader pane with a hint until a message is opened.
   if (messages.length && !openId) {
-    el.reader.innerHTML = `<div class="hidden md:flex h-full items-center justify-center text-slate-500 text-sm">Select a message to read it here</div>`;
+    el.reader.innerHTML = `<div class="hidden md:flex h-full items-center justify-center text-slate-500 text-sm">Select A Message To Read It Here</div>`;
   }
   el.list.innerHTML = messages
     .map((m) => {
@@ -389,15 +389,18 @@ function renderInbox() {
         hour: "2-digit",
         minute: "2-digit",
       });
-      const active = m.id === openId ? "bg-accent/15" : "hover:bg-edge/60";
+      const active =
+        m.id === openId
+          ? "bg-emerald-400/10 shadow-[inset_3px_0_0_#34d399]"
+          : "hover:bg-white/[0.04]";
       const unread = !m.seen
-        ? `<span class="h-2 w-2 rounded-full bg-accent shrink-0 mt-1.5"></span>`
+        ? `<span class="h-2 w-2 rounded-full bg-mint shadow-[0_0_8px_#34d399] shrink-0 mt-1.5"></span>`
         : `<span class="w-2 shrink-0"></span>`;
       return `<li data-id="${m.id}" class="ping-in cursor-pointer px-4 py-3 flex gap-2.5 transition ${active}">
       ${unread}
       <div class="min-w-0 flex-1">
         <div class="flex items-baseline justify-between gap-2">
-          <span class="text-sm font-medium text-slate-100 truncate">${esc(from)}</span>
+          <span class="text-sm font-bold text-slate-100 truncate">${esc(from)}</span>
           <span class="text-[11px] text-slate-500 shrink-0">${time}</span>
         </div>
         <div class="text-sm text-slate-300 truncate ${m.seen ? "" : "font-semibold"}">${esc(m.subject || "(no subject)")}</div>
@@ -426,7 +429,7 @@ function tick() {
     s = Math.floor((left % 60000) / 1000);
   el.timer.textContent = `${m}:${String(s).padStart(2, "0")}`;
   el.timer.className =
-    "font-mono text-2xl sm:text-3xl font-extrabold tabular-nums leading-none " +
+    "font-mono text-3xl sm:text-4xl font-extrabold tabular-nums leading-none sm:text-right " +
     (left < 30000
       ? "text-rose-400"
       : left < 120000
@@ -439,17 +442,19 @@ async function onExpire() {
   expired = true;
   el.timer.textContent = "0:00";
   el.timer.className =
-    "font-mono text-2xl sm:text-3xl font-extrabold text-rose-500 tabular-nums leading-none";
+    "font-mono text-3xl sm:text-4xl font-extrabold text-rose-500 tabular-nums leading-none sm:text-right";
   clearInterval(pollTimer);
-  el.poll.innerHTML = `<span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span> expired`;
+  el.poll.innerHTML = `<span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span> Expired`;
   el.list.innerHTML = "";
   el.reader.classList.add("hidden");
   el.box.style.display = "none";
   el.empty.style.display = "block";
-  el.empty.innerHTML = `<div class="text-2xl mb-1.5">⌛</div>
-    <p class="text-slate-200 font-semibold text-sm">This address expired</p>
-    <p class="text-slate-500 text-xs mt-1 mb-3">Its inbox was wiped. Grab a fresh one to keep going.</p>
-    <button id="restart" class="px-4 py-2 rounded-lg btn-accent text-white text-sm font-bold">Get a new address</button>`;
+  el.empty.innerHTML = `<div class="mx-auto mb-3 h-12 w-12 rounded-2xl btn-ghost grid place-items-center text-rose-400">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+    </div>
+    <p class="text-slate-100 font-bold text-sm">This Address Expired</p>
+    <p class="text-slate-500 text-xs mt-1.5 mb-4">Its Inbox Was Wiped. Grab A Fresh One To Keep Going.</p>
+    <button id="restart" class="px-4 py-2.5 rounded-xl btn-accent text-sm font-extrabold transition hover:-translate-y-0.5">Get A New Address</button>`;
   $("restart").addEventListener("click", actNew);
   const old = session;
   await deleteMailbox(old);
@@ -464,8 +469,8 @@ function setPollStatus(state) {
   if (expired) return;
   const [dot, label] =
     state === "retry"
-      ? ["bg-amber-400", "reconnecting…"]
-      : ["bg-emerald-400", "auto-refreshing"];
+      ? ["bg-amber-400", "Reconnecting…"]
+      : ["bg-emerald-400 dot-live", "Auto-Refreshing"];
   el.poll.innerHTML = `<span class="h-1.5 w-1.5 rounded-full ${dot}"></span> ${label}`;
 }
 
@@ -504,7 +509,7 @@ el.refresh.addEventListener("click", actRefresh);
     tick();
     startPolling();
   } catch (e) {
-    el.address.textContent = "error";
-    toast("Failed to create mailbox: " + e.message);
+    el.address.textContent = "Error";
+    toast("Failed To Create Mailbox: " + e.message);
   }
 })();

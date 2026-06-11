@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>10MinMail — disposable temporary email</title>
+    <title>10MinMail — Disposable Temporary Email</title>
     <meta
       name="description"
       content="Get a free temporary email address that lasts 10 minutes. Receive real emails, register anywhere, no signup."
@@ -14,7 +14,7 @@
     <meta property="og:type" content="website" />
     <meta
       property="og:title"
-      content="10MinMail — disposable temporary email"
+      content="10MinMail — Disposable Temporary Email"
     />
     <meta
       property="og:description"
@@ -31,7 +31,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
-      content="10MinMail — disposable temporary email"
+      content="10MinMail — Disposable Temporary Email"
     />
     <meta
       name="twitter:description"
@@ -42,16 +42,19 @@
       content="https://10minmail-production.up.railway.app/docs/01-hero.png"
     />
     <meta name="twitter:creator" content="@KhaledQ84Ever" />
-    <meta name="theme-color" content="#6366f1" />
+    <meta name="theme-color" content="#10b981" />
 
+    <!-- Pro envelope logo mark as favicon (emerald gradient) -->
     <link
       rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✉️</text></svg>"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%2334d399'/><stop offset='1' stop-color='%23059669'/></linearGradient></defs><rect width='32' height='32' rx='8' fill='url(%23g)'/><rect x='6' y='9' width='20' height='14' rx='3' fill='none' stroke='white' stroke-width='2'/><path d='M7 11l8.2 6a1.4 1.4 0 0 0 1.6 0L25 11' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/></svg>"
     />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
     <script>
@@ -59,60 +62,150 @@
         theme: {
           extend: {
             fontFamily: {
-              sans: ["Inter", "system-ui", "sans-serif"],
+              display: ['"Bricolage Grotesque"', "sans-serif"],
+              sans: ['"Plus Jakarta Sans"', "system-ui", "sans-serif"],
               mono: ['"JetBrains Mono"', "monospace"],
             },
             colors: {
-              ink: "#0a0e1a",
-              panel: "#11162a",
-              edge: "#1e2540",
-              accent: "#6366f1",
+              ink: "#090c10",
+              panel: "#10151c",
+              edge: "#222c38",
+              accent: "#10b981",
+              mint: "#34d399",
+              teal: "#2dd4bf",
             },
           },
         },
       };
     </script>
     <style>
+      :root {
+        --bg: #080b0f;
+      }
       html,
       body {
-        background: #0a0e1a;
+        background: var(--bg);
       }
+      body {
+        position: relative;
+        overflow-x: hidden;
+      }
+      /* Mesh-gradient atmosphere — emerald + teal bloom, warm graphite base. */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        background:
+          radial-gradient(
+            900px 520px at 18% -8%,
+            rgba(16, 185, 129, 0.16),
+            transparent 60%
+          ),
+          radial-gradient(
+            780px 500px at 92% 4%,
+            rgba(45, 212, 191, 0.12),
+            transparent 62%
+          ),
+          radial-gradient(
+            1000px 700px at 50% 120%,
+            rgba(16, 185, 129, 0.08),
+            transparent 60%
+          );
+      }
+      /* Fine grain so flat panels get a premium, non-plasticky texture. */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        opacity: 0.035;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
       ::-webkit-scrollbar {
         width: 10px;
         height: 10px;
       }
       ::-webkit-scrollbar-thumb {
-        background: #2a3357;
+        background: #28333f;
         border-radius: 8px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #34404e;
+        background-clip: padding-box;
       }
       ::-webkit-scrollbar-track {
         background: transparent;
       }
+      ::selection {
+        background: rgba(16, 185, 129, 0.3);
+        color: #fff;
+      }
+
+      /* Glass panel: subtle blur, crisp inner light edge, deep layered shadow. */
+      .glass {
+        background:
+          linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.035),
+            rgba(255, 255, 255, 0)
+          ),
+          rgba(16, 21, 28, 0.72);
+        backdrop-filter: blur(14px) saturate(140%);
+        -webkit-backdrop-filter: blur(14px) saturate(140%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
       .glow {
         box-shadow:
-          0 0 0 1px rgba(99, 102, 241, 0.35),
-          0 24px 70px -20px rgba(99, 102, 241, 0.55),
-          inset 0 1px 0 rgba(255, 255, 255, 0.04);
+          0 0 0 1px rgba(16, 185, 129, 0.22),
+          0 34px 90px -34px rgba(16, 185, 129, 0.5),
+          0 8px 30px -12px rgba(0, 0, 0, 0.6),
+          inset 0 1px 0 rgba(255, 255, 255, 0.06);
       }
       .card-shadow {
-        box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.7);
+        box-shadow:
+          0 30px 70px -32px rgba(0, 0, 0, 0.75),
+          inset 0 1px 0 rgba(255, 255, 255, 0.04);
       }
+
       .text-grad {
-        background: linear-gradient(135deg, #a5b4fc, #6366f1 45%, #c084fc);
+        background: linear-gradient(100deg, #6ee7b7, #10b981 48%, #2dd4bf);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
       }
+
+      /* Primary action — emerald gradient, crisp ring, soft outer glow. */
       .btn-accent {
-        background: linear-gradient(135deg, #6366f1, #7c3aed);
-        box-shadow: 0 10px 28px -8px rgba(99, 102, 241, 0.7);
+        background: linear-gradient(135deg, #34d399, #10b981 55%, #059669);
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.25) inset,
+          0 12px 30px -10px rgba(16, 185, 129, 0.75);
+        color: #03241a;
       }
       .btn-accent:hover {
-        box-shadow: 0 12px 32px -6px rgba(124, 58, 237, 0.85);
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.3) inset,
+          0 16px 38px -8px rgba(16, 185, 129, 0.9);
       }
+      /* Secondary action — glass with hover lift. */
+      .btn-ghost {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        box-shadow: 0 8px 22px -14px rgba(0, 0, 0, 0.8);
+      }
+      .btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(52, 211, 153, 0.4);
+      }
+
       @keyframes ping-in {
         0% {
-          transform: scale(0.9);
+          transform: scale(0.96);
           opacity: 0;
         }
         100% {
@@ -123,61 +216,131 @@
       .ping-in {
         animation: ping-in 0.25s ease-out;
       }
-      .grad {
-        background: radial-gradient(
-          1200px 600px at 50% -10%,
-          rgba(99, 102, 241, 0.18),
-          transparent 60%
-        );
+
+      /* Staggered page-load reveal. */
+      @keyframes rise {
+        0% {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .reveal {
+        opacity: 0;
+        animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+      .d1 {
+        animation-delay: 0.05s;
+      }
+      .d2 {
+        animation-delay: 0.16s;
+      }
+      .d3 {
+        animation-delay: 0.27s;
+      }
+      .d4 {
+        animation-delay: 0.38s;
+      }
+
+      /* Soft pulse on the live status dot. */
+      @keyframes breathe {
+        0%,
+        100% {
+          opacity: 1;
+          box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.5);
+        }
+        50% {
+          opacity: 0.6;
+          box-shadow: 0 0 0 4px rgba(52, 211, 153, 0);
+        }
+      }
+      .dot-live {
+        animation: breathe 2s ease-in-out infinite;
       }
     </style>
   </head>
-  <body class="grad min-h-screen text-slate-200 font-sans antialiased">
-    <div class="max-w-3xl mx-auto px-4 py-5 sm:py-7">
+  <body class="min-h-screen text-slate-200 font-sans antialiased">
+    <div class="max-w-3xl mx-auto px-4 py-6 sm:py-9">
       <!-- Header -->
-      <header class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-2.5">
+      <header class="reveal d1 flex items-center justify-between gap-3 mb-7">
+        <div class="flex items-center gap-3">
           <div
-            class="h-9 w-9 rounded-xl btn-accent grid place-items-center text-lg shadow-lg"
+            class="relative h-11 w-11 rounded-2xl btn-accent grid place-items-center shadow-lg"
           >
-            ✉️
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#03241a"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="5" width="18" height="14" rx="3.2" />
+              <path d="M4 7.5l7.3 5.4a1.4 1.4 0 0 0 1.4 0L20 7.5" />
+            </svg>
           </div>
           <div>
             <h1
-              class="text-xl font-extrabold tracking-tight text-grad leading-none"
+              class="font-display text-2xl font-extrabold tracking-tight text-grad leading-none"
             >
               10MinMail
             </h1>
-            <p class="text-xs text-slate-400 mt-1 font-medium">
-              Disposable email · no signup
+            <p
+              class="text-xs text-slate-400 mt-1.5 font-semibold tracking-wide"
+            >
+              Disposable Email · No Signup
             </p>
           </div>
         </div>
-        <span class="text-xs text-slate-400 hidden sm:block">
-          Privacy: addresses &amp; mail auto-delete on expiry
+        <span
+          class="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-semibold text-mint/90 glass rounded-full px-3 py-1.5"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          Auto-Deletes On Expiry
         </span>
       </header>
 
       <!-- Address card -->
-      <section class="rounded-2xl bg-panel border border-edge glow p-5 mb-4">
-        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+      <section class="reveal d2 rounded-3xl glass glow p-5 sm:p-6 mb-4">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-5">
           <div class="flex-1 min-w-0">
             <p
-              class="text-[11px] uppercase tracking-widest font-semibold text-accent mb-2"
+              class="text-[11px] uppercase tracking-[0.18em] font-bold text-mint mb-2.5"
             >
-              Your temporary address
+              Your Temporary Address
             </p>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2.5">
               <code
                 id="address"
-                class="font-mono text-base sm:text-xl font-bold text-white truncate select-all"
-                >generating…</code
+                title="Click To Copy"
+                class="font-mono text-base sm:text-xl font-extrabold text-white truncate select-all cursor-pointer"
+                >Generating…</code
               >
               <button
                 id="copyBtn"
                 title="Copy"
-                aria-label="Copy address"
-                class="shrink-0 h-9 w-9 grid place-items-center rounded-lg bg-edge hover:bg-accent/30 transition text-slate-300 hover:text-white"
+                aria-label="Copy Address"
+                class="shrink-0 h-9 w-9 grid place-items-center rounded-xl btn-ghost transition text-slate-300 hover:text-mint"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -189,6 +352,7 @@
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
+                  aria-hidden="true"
                 >
                   <rect x="9" y="9" width="13" height="13" rx="2" />
                   <path
@@ -200,28 +364,28 @@
           </div>
 
           <!-- Timer -->
-          <div class="flex items-center gap-4">
-            <div class="text-right">
-              <p
-                class="text-[11px] uppercase tracking-widest font-semibold text-slate-400 mb-1.5"
-              >
-                Expires in
-              </p>
-              <div
-                id="timer"
-                class="font-mono text-2xl sm:text-3xl font-extrabold text-emerald-400 tabular-nums leading-none drop-shadow-[0_2px_12px_rgba(52,211,153,0.4)]"
-              >
-                10:00
-              </div>
+          <div
+            class="sm:border-l sm:border-white/10 sm:pl-5 flex sm:block items-center justify-between"
+          >
+            <p
+              class="text-[11px] uppercase tracking-[0.18em] font-bold text-slate-400 mb-0 sm:mb-1.5 sm:text-right"
+            >
+              Expires In
+            </p>
+            <div
+              id="timer"
+              class="font-mono text-3xl sm:text-4xl font-extrabold text-emerald-400 tabular-nums leading-none sm:text-right drop-shadow-[0_2px_16px_rgba(52,211,153,0.45)]"
+            >
+              10:00
             </div>
           </div>
         </div>
 
         <!-- Actions -->
-        <div class="flex flex-wrap gap-2 mt-5">
+        <div class="flex flex-wrap gap-2.5 mt-6">
           <button
             id="extendBtn"
-            class="px-4 py-2.5 rounded-xl btn-accent text-white text-sm font-bold transition hover:-translate-y-0.5 flex items-center gap-1.5"
+            class="px-4 py-2.5 rounded-xl btn-accent text-sm font-extrabold transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -230,18 +394,19 @@
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2"
+              stroke-width="2.2"
               stroke-linecap="round"
               stroke-linejoin="round"
+              aria-hidden="true"
             >
               <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
               <path d="M3 3v5h5" />
             </svg>
-            Extend +10 min
+            Extend +10 Min
           </button>
           <button
             id="newBtn"
-            class="px-4 py-2.5 rounded-xl bg-edge hover:bg-slate-700 text-slate-100 text-sm font-bold transition hover:-translate-y-0.5 shadow-lg shadow-black/30 flex items-center gap-1.5"
+            class="px-4 py-2.5 rounded-xl btn-ghost text-slate-100 text-sm font-bold transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -250,17 +415,18 @@
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2"
+              stroke-width="2.2"
               stroke-linecap="round"
               stroke-linejoin="round"
+              aria-hidden="true"
             >
               <path d="M12 5v14M5 12h14" />
             </svg>
-            New address
+            New Address
           </button>
           <button
             id="refreshBtn"
-            class="px-4 py-2.5 rounded-xl bg-edge hover:bg-slate-700 text-slate-100 text-sm font-bold transition hover:-translate-y-0.5 shadow-lg shadow-black/30 flex items-center gap-1.5"
+            class="px-4 py-2.5 rounded-xl btn-ghost text-slate-100 text-sm font-bold transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -269,9 +435,10 @@
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2"
+              stroke-width="2.2"
               stroke-linecap="round"
               stroke-linejoin="round"
+              aria-hidden="true"
             >
               <path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
               <path d="M21 3v5h-5" />
@@ -282,26 +449,28 @@
       </section>
 
       <!-- Inbox -->
-      <section
-        class="rounded-2xl bg-panel border border-edge overflow-hidden card-shadow"
-      >
+      <section class="reveal d3 rounded-3xl glass overflow-hidden card-shadow">
         <div
-          class="flex items-center justify-between px-4 py-2.5 border-b border-edge"
+          class="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10"
         >
-          <h2 class="text-sm font-bold text-white flex items-center gap-2">
+          <h2
+            class="text-sm font-display font-bold text-white flex items-center gap-2"
+          >
             Inbox
             <span
               id="count"
-              class="text-[10px] font-bold px-1.5 py-0.5 rounded-full btn-accent text-white"
+              class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full btn-accent"
               >0</span
             >
           </h2>
           <span
             id="poll"
-            class="text-[10px] text-slate-500 flex items-center gap-1.5"
+            class="text-[11px] font-semibold text-slate-400 flex items-center gap-1.5"
           >
-            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-            auto-refreshing
+            <span
+              class="h-1.5 w-1.5 rounded-full bg-emerald-400 dot-live"
+            ></span>
+            Auto-Refreshing
           </span>
         </div>
 
@@ -309,38 +478,56 @@
         <div
           id="box"
           style="display: none"
-          class="grid md:grid-cols-[minmax(0,300px)_1fr] min-h-[140px]"
+          class="grid md:grid-cols-[minmax(0,300px)_1fr] min-h-[150px]"
         >
           <ul
             id="list"
-            class="divide-y divide-edge md:border-r border-edge max-h-[45vh] overflow-y-auto"
+            class="divide-y divide-white/[0.06] md:border-r border-white/10 max-h-[48vh] overflow-y-auto"
           ></ul>
           <div id="reader" class="hidden md:block p-4 text-slate-400"></div>
         </div>
 
         <!-- empty state -->
-        <div id="empty" class="px-4 py-6 text-center">
-          <div class="text-2xl mb-1.5">📭</div>
-          <p class="text-slate-200 font-semibold text-sm">
-            Waiting for emails…
-          </p>
-          <p class="text-slate-500 text-xs mt-1">
-            Use the address above to sign up anywhere.
+        <div id="empty" class="px-4 py-9 text-center">
+          <div
+            class="mx-auto mb-3 h-12 w-12 rounded-2xl btn-ghost grid place-items-center text-mint"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M22 12h-6l-2 3h-4l-2-3H2" />
+              <path
+                d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
+              />
+            </svg>
+          </div>
+          <p class="text-slate-100 font-bold text-sm">Waiting For Emails…</p>
+          <p class="text-slate-500 text-xs mt-1.5">
+            Use The Address Above To Sign Up Anywhere.
           </p>
         </div>
       </section>
 
-      <p class="text-center text-[11px] text-slate-600 mt-6">
-        Mail backend by mail.tm · for testing & throwaway signups only — never
-        use for sensitive accounts.
+      <p class="reveal d4 text-center text-[11px] text-slate-500 mt-7 px-4">
+        Mail Backend By mail.tm · For Testing &amp; Throwaway Signups Only —
+        Never Use For Sensitive Accounts.
       </p>
-      <p class="text-center text-[11px] text-slate-500 mt-2">
-        Program by
+      <p class="reveal d4 text-center text-[11px] text-slate-500 mt-2">
+        Built By
         <a
           href="https://x.com/KhaledQ84Ever"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-accent hover:text-indigo-400 font-medium transition"
+          class="text-mint hover:text-emerald-300 font-bold transition"
           >@KhaledQ84Ever</a
         >
       </p>
@@ -349,7 +536,13 @@
     <!-- toast -->
     <div
       id="toast"
-      class="fixed bottom-5 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg bg-white text-slate-900 text-sm font-medium shadow-lg opacity-0 pointer-events-none transition-opacity"
+      class="fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2.5 rounded-xl text-white text-sm font-bold opacity-0 pointer-events-none transition-opacity z-50"
+      style="
+        background: rgba(9, 12, 16, 0.92);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(52, 211, 153, 0.35);
+        box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.7);
+      "
     ></div>
 
     <script src="./app.js"></script>
