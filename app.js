@@ -455,6 +455,19 @@ function startPolling() {
   pollTimer = setInterval(poll, POLL_MS);
 }
 
+/* Don't keep hammering the rate-limited API while the tab is in the background
+   (the common case: user switches away to trigger a verification email). Pause
+   polling when hidden, then do an immediate catch-up poll the moment they return
+   so any mail that arrived while away shows instantly. */
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    clearInterval(pollTimer);
+    pollTimer = null;
+  } else if (session && !expired) {
+    startPolling();
+  }
+});
+
 /* ---------- wire up ---------- */
 el.copy.addEventListener("click", actCopy);
 el.address.addEventListener("click", actCopy);

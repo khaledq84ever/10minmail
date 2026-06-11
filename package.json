@@ -4,7 +4,8 @@
   "description": "Disposable 10-minute temporary email web app (mail.tm backend)",
   "private": true,
   "scripts": {
-    "start": "serve -l tcp://0.0.0.0:${PORT:-3000}"
+    "start": "serve -l tcp://0.0.0.0:${PORT:-3000}",
+    "test": "node test/visibility.test.js"
   },
   "dependencies": {
     "serve": "^14.2.4"
