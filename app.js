@@ -16,6 +16,7 @@ const el = {
   extend: $("extendBtn"),
   new: $("newBtn"),
   refresh: $("refreshBtn"),
+  box: $("box"),
   list: $("list"),
   reader: $("reader"),
   empty: $("empty"),
@@ -337,6 +338,9 @@ const esc = (s) =>
 
 function renderInbox() {
   el.count.textContent = String(messages.length);
+  // Show the list/reader grid only when there's mail; otherwise just the compact
+  // empty state — no tall dead space when the inbox is empty.
+  el.box.style.display = messages.length ? "grid" : "none";
   el.empty.style.display = messages.length ? "none" : "block";
   el.list.innerHTML = messages
     .map((m) => {
@@ -400,11 +404,12 @@ async function onExpire() {
   el.poll.innerHTML = `<span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span> expired`;
   el.list.innerHTML = "";
   el.reader.classList.add("hidden");
+  el.box.style.display = "none";
   el.empty.style.display = "block";
-  el.empty.innerHTML = `<div class="text-4xl mb-3">⌛</div>
-    <p class="text-slate-200 font-medium">This address expired</p>
-    <p class="text-slate-500 text-sm mt-1 mb-4">Its inbox was wiped. Grab a fresh one to keep going.</p>
-    <button id="restart" class="px-4 py-2 rounded-lg bg-accent hover:bg-indigo-500 text-white text-sm font-medium">Get a new address</button>`;
+  el.empty.innerHTML = `<div class="text-2xl mb-1.5">⌛</div>
+    <p class="text-slate-200 font-semibold text-sm">This address expired</p>
+    <p class="text-slate-500 text-xs mt-1 mb-3">Its inbox was wiped. Grab a fresh one to keep going.</p>
+    <button id="restart" class="px-4 py-2 rounded-lg btn-accent text-white text-sm font-bold">Get a new address</button>`;
   $("restart").addEventListener("click", actNew);
   const old = session;
   await deleteMailbox(old);
