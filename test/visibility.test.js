@@ -44,7 +44,9 @@ const sandbox = {
   console,
   document: {
     hidden: false,
+    documentElement: {},
     getElementById: (id) => (els[id] ||= stubEl()),
+    querySelectorAll: () => [], // no static [data-i18n] nodes in this harness
     addEventListener: (ev, fn) => {
       if (ev === "visibilitychange") visHandler = fn;
     },
@@ -111,7 +113,8 @@ const flush = () => new Promise((r) => setTimeout(r, 50));
   assert.ok(visHandler, "visibilitychange handler should be registered");
   assert.strictEqual(pollIntervals(), 1, "polling should be active on load");
   assert.ok(pollFetches >= 1, "should have polled at least once on load");
-  assert.match(pollPill(), /auto-refreshing/i, "pill should start as live");
+  // Assert on the language-independent dot class (text is i18n'd).
+  assert.match(pollPill(), /dot-live/, "pill should start as live");
 
   sandbox.document.hidden = true;
   visHandler();
@@ -132,8 +135,8 @@ const flush = () => new Promise((r) => setTimeout(r, 50));
   await flush();
   assert.match(
     pollPill(),
-    /reconnecting/i,
-    "pill should show reconnecting after repeated poll failures",
+    /bg-amber-400/,
+    "pill should show reconnecting (amber) after repeated poll failures",
   );
 
   failMessages = false;
@@ -141,7 +144,7 @@ const flush = () => new Promise((r) => setTimeout(r, 50));
   await flush();
   assert.match(
     pollPill(),
-    /auto-refreshing/i,
+    /dot-live/,
     "pill should return to live after a successful poll",
   );
 

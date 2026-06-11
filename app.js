@@ -23,7 +23,129 @@ const el = {
   count: $("count"),
   toast: $("toast"),
   poll: $("poll"),
+  lang: $("langBtn"),
 };
+
+/* ---------- i18n (Arabic-first, English toggle) ---------- */
+const I18N = {
+  ar: {
+    subtitle: "بريد مؤقت · بدون تسجيل",
+    auto_delete: "يُحذف تلقائيًا عند الانتهاء",
+    title_addr: "عنوانك المؤقت",
+    expires_in: "ينتهي خلال",
+    new_email: "بريد جديد",
+    refresh: "تحديث",
+    refresh_title: "تحديث الوارد · +10 دقائق",
+    inbox: "الوارد",
+    waiting: "بانتظار الرسائل…",
+    waiting_sub: "استخدم العنوان أعلاه للتسجيل في أي مكان.",
+    footer_note:
+      "مزوّد البريد mail.tm · للاختبار والتسجيلات المؤقتة فقط — لا تستخدمه لحسابات حساسة.",
+    built_by: "برمجة",
+    copy_aria: "نسخ العنوان",
+    click_copy: "اضغط للنسخ",
+    auto_refreshing: "تحديث تلقائي",
+    reconnecting: "إعادة الاتصال…",
+    expired_pill: "منتهٍ",
+    generating: "جارٍ الإنشاء…",
+    new_ready: "تم تجهيز بريد جديد",
+    new_fail: "تعذّر الحصول على بريد جديد: ",
+    max_60: "بلغت الحد الأقصى 60 دقيقة",
+    refreshed_10: "+10 دقائق · تم التحديث",
+    copied: "تم نسخ العنوان",
+    copy_fail: "فشل النسخ",
+    new_mail: "📬 وصلت رسالة جديدة",
+    loading: "جارٍ التحميل…",
+    from: "من",
+    no_subject: "(بدون موضوع)",
+    empty_msg: "(رسالة فارغة)",
+    select_msg: "اختر رسالة لقراءتها هنا",
+    load_fail: "تعذّر تحميل الرسالة: ",
+    create_fail: "تعذّر إنشاء البريد: ",
+    error: "خطأ",
+    expired_title: "انتهى هذا العنوان",
+    expired_sub: "تم مسح الوارد. احصل على عنوان جديد للمتابعة.",
+    get_new: "احصل على بريد جديد",
+  },
+  en: {
+    subtitle: "Disposable Email · No Signup",
+    auto_delete: "Auto-Deletes On Expiry",
+    title_addr: "Your Temporary Address",
+    expires_in: "Expires In",
+    new_email: "New Email",
+    refresh: "Refresh",
+    refresh_title: "Reload Inbox · +10 Min",
+    inbox: "Inbox",
+    waiting: "Waiting For Emails…",
+    waiting_sub: "Use The Address Above To Sign Up Anywhere.",
+    footer_note:
+      "Mail Backend By mail.tm · For Testing & Throwaway Signups Only — Never Use For Sensitive Accounts.",
+    built_by: "Built By",
+    copy_aria: "Copy Address",
+    click_copy: "Click To Copy",
+    auto_refreshing: "Auto-Refreshing",
+    reconnecting: "Reconnecting…",
+    expired_pill: "Expired",
+    generating: "Generating…",
+    new_ready: "New Email Ready",
+    new_fail: "Couldn't Get A New Email: ",
+    max_60: "Reached 60-Min Max",
+    refreshed_10: "+10 Min · Refreshed",
+    copied: "Address Copied",
+    copy_fail: "Copy Failed",
+    new_mail: "📬 New Email Received",
+    loading: "Loading…",
+    from: "From",
+    no_subject: "(no subject)",
+    empty_msg: "(empty message)",
+    select_msg: "Select A Message To Read It Here",
+    load_fail: "Could Not Load Message: ",
+    create_fail: "Failed To Create Mailbox: ",
+    error: "Error",
+    expired_title: "This Address Expired",
+    expired_sub: "Its Inbox Was Wiped. Grab A Fresh One To Keep Going.",
+    get_new: "Get A New Email",
+  },
+};
+const LANG_KEY = "tenminmail.lang";
+let LANG = "ar";
+try {
+  const saved = localStorage.getItem(LANG_KEY);
+  if (saved === "ar" || saved === "en") LANG = saved;
+} catch {}
+const t = (k) => (I18N[LANG] && I18N[LANG][k]) ?? I18N.en[k] ?? k;
+
+/* Apply a language: flip dir/lang + font, translate all static [data-i18n]
+   nodes (and title/aria attributes), then repaint the dynamic bits. */
+function applyLang(lang) {
+  LANG = lang === "en" ? "en" : "ar";
+  try {
+    localStorage.setItem(LANG_KEY, LANG);
+  } catch {}
+  const html = document.documentElement;
+  html.lang = LANG;
+  html.dir = LANG === "ar" ? "rtl" : "ltr";
+  document
+    .querySelectorAll("[data-i18n]")
+    .forEach((n) => (n.textContent = t(n.getAttribute("data-i18n"))));
+  document
+    .querySelectorAll("[data-i18n-title]")
+    .forEach((n) =>
+      n.setAttribute("title", t(n.getAttribute("data-i18n-title"))),
+    );
+  document
+    .querySelectorAll("[data-i18n-aria]")
+    .forEach((n) =>
+      n.setAttribute("aria-label", t(n.getAttribute("data-i18n-aria"))),
+    );
+  if (el.lang) el.lang.textContent = LANG === "ar" ? "EN" : "ع";
+  // Repaint dynamic content in the new language.
+  if (expired) paintExpired();
+  else {
+    setPollStatus(pollFails >= 2 ? "retry" : "live");
+    if (session) renderInbox();
+  }
+}
 
 // The inbox empty-state markup as shipped in index.html. onExpire() overwrites
 // it with an "expired" message, so we keep the original to restore on a fresh box.
@@ -224,15 +346,15 @@ async function actNew() {
   creating = true;
   const old = session;
   const prev = el.address.textContent;
-  el.address.textContent = "Generating…";
+  el.address.textContent = t("generating");
   try {
     await createMailbox();
     await deleteMailbox(old);
-    toast("New Email Ready");
+    toast(t("new_ready"));
     startPolling();
   } catch (e) {
     el.address.textContent = prev; // keep current address usable on failure
-    toast("Couldn't Get A New Email: " + e.message);
+    toast(t("new_fail") + e.message);
   } finally {
     creating = false;
   }
@@ -248,17 +370,15 @@ function actRefresh() {
   save();
   tick();
   poll();
-  toast(
-    session.expiresAt >= cap ? "Reached 60-Min Max" : "+10 Min · Refreshed",
-  );
+  toast(session.expiresAt >= cap ? t("max_60") : t("refreshed_10"));
 }
 
 async function actCopy() {
   try {
     await navigator.clipboard.writeText(session.address);
-    toast("Address Copied");
+    toast(t("copied"));
   } catch {
-    toast("Copy Failed");
+    toast(t("copy_fail"));
   }
 }
 
@@ -278,7 +398,7 @@ async function poll() {
     const list = d["hydra:member"] || [];
     const fresh = list.some((m) => !seen.has(m.id));
     messages = list;
-    if (fresh && seen.size > 0) toast("📬 New Email Received");
+    if (fresh && seen.size > 0) toast(t("new_mail"));
     list.forEach((m) => seen.add(m.id));
     renderInbox();
     saveMsgs();
@@ -302,7 +422,7 @@ async function openMessage(id) {
   const opened = messages.find((m) => m.id === id);
   if (opened) opened.seen = true;
   el.reader.classList.remove("hidden");
-  el.reader.innerHTML = `<div class="text-slate-500 text-sm">Loading…</div>`;
+  el.reader.innerHTML = `<div class="text-slate-500 text-sm">${t("loading")}</div>`;
   renderInbox();
   saveMsgs();
   try {
@@ -324,8 +444,8 @@ async function openMessage(id) {
     const bodyHtml = m.html && m.html.length ? m.html.join("") : null;
     el.reader.innerHTML = `
       <div class="mb-4">
-        <h3 class="text-white font-semibold text-base mb-1 break-words">${esc(m.subject || "(no subject)")}</h3>
-        <div class="text-sm text-slate-400 break-words">From <span class="text-slate-200 font-semibold">${esc(from)}</span></div>
+        <h3 class="text-white font-semibold text-base mb-1 break-words">${esc(m.subject || t("no_subject"))}</h3>
+        <div class="text-sm text-slate-400 break-words">${t("from")} <span dir="ltr" class="text-slate-200 font-semibold">${esc(from)}</span></div>
         <div class="text-xs text-slate-500 mt-0.5">${date}</div>
       </div>`;
     if (bodyHtml) {
@@ -348,11 +468,11 @@ async function openMessage(id) {
       const pre = document.createElement("pre");
       pre.className =
         "whitespace-pre-wrap text-sm text-slate-300 leading-relaxed";
-      pre.textContent = m.text || "(empty message)";
+      pre.textContent = m.text || t("empty_msg");
       el.reader.appendChild(pre);
     }
   } catch (e) {
-    el.reader.innerHTML = `<div class="text-rose-400 text-sm">Could Not Load Message: ${esc(e.message)}</div>`;
+    el.reader.innerHTML = `<div class="text-rose-400 text-sm">${t("load_fail")}${esc(e.message)}</div>`;
   }
 }
 
@@ -373,7 +493,7 @@ function renderInbox() {
   el.empty.style.display = messages.length ? "none" : "block";
   // Fill the otherwise-blank desktop reader pane with a hint until a message is opened.
   if (messages.length && !openId) {
-    el.reader.innerHTML = `<div class="hidden md:flex h-full items-center justify-center text-slate-500 text-sm">Select A Message To Read It Here</div>`;
+    el.reader.innerHTML = `<div class="hidden md:flex h-full items-center justify-center text-slate-500 text-sm">${t("select_msg")}</div>`;
   }
   el.list.innerHTML = messages
     .map((m) => {
@@ -393,10 +513,10 @@ function renderInbox() {
       ${unread}
       <div class="min-w-0 flex-1">
         <div class="flex items-baseline justify-between gap-2">
-          <span class="text-sm font-bold text-slate-100 truncate">${esc(from)}</span>
-          <span class="text-[11px] text-slate-500 shrink-0">${time}</span>
+          <span dir="ltr" class="text-sm font-bold text-slate-100 truncate">${esc(from)}</span>
+          <span dir="ltr" class="text-[11px] text-slate-500 shrink-0">${time}</span>
         </div>
-        <div class="text-sm text-slate-300 truncate ${m.seen ? "" : "font-semibold"}">${esc(m.subject || "(no subject)")}</div>
+        <div class="text-sm text-slate-300 truncate ${m.seen ? "" : "font-semibold"}">${esc(m.subject || t("no_subject"))}</div>
         <div class="text-xs text-slate-500 truncate">${esc(m.intro || "")}</div>
       </div>
     </li>`;
@@ -430,14 +550,10 @@ function tick() {
         : "text-emerald-400");
 }
 
-async function onExpire() {
-  if (expired) return;
-  expired = true;
-  el.timer.textContent = "0:00";
-  el.timer.className =
-    "font-mono text-3xl sm:text-4xl font-extrabold text-rose-500 tabular-nums leading-none sm:text-right";
-  clearInterval(pollTimer);
-  el.poll.innerHTML = `<span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span> Expired`;
+// Paint the terminal "expired" state into the inbox card. Split out so a
+// language toggle can repaint it in the new language.
+function paintExpired() {
+  el.poll.innerHTML = `<span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span> ${t("expired_pill")}`;
   el.list.innerHTML = "";
   el.reader.classList.add("hidden");
   el.box.style.display = "none";
@@ -445,10 +561,20 @@ async function onExpire() {
   el.empty.innerHTML = `<div class="mx-auto mb-3 h-12 w-12 rounded-2xl btn-ghost grid place-items-center text-rose-400">
       <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
     </div>
-    <p class="text-slate-100 font-bold text-sm">This Address Expired</p>
-    <p class="text-slate-500 text-xs mt-1.5 mb-4">Its Inbox Was Wiped. Grab A Fresh One To Keep Going.</p>
-    <button id="restart" class="px-4 py-2.5 rounded-xl btn-accent text-sm font-extrabold transition hover:-translate-y-0.5">Get A New Address</button>`;
+    <p class="text-slate-100 font-bold text-sm">${t("expired_title")}</p>
+    <p class="text-slate-500 text-xs mt-1.5 mb-4">${t("expired_sub")}</p>
+    <button id="restart" class="px-4 py-2.5 rounded-xl btn-accent text-sm font-extrabold transition hover:-translate-y-0.5">${t("get_new")}</button>`;
   $("restart").addEventListener("click", actNew);
+}
+
+async function onExpire() {
+  if (expired) return;
+  expired = true;
+  el.timer.textContent = "0:00";
+  el.timer.className =
+    "font-mono text-3xl sm:text-4xl font-extrabold text-rose-500 tabular-nums leading-none sm:text-end";
+  clearInterval(pollTimer);
+  paintExpired();
   const old = session;
   await deleteMailbox(old);
   localStorage.removeItem(STORE_KEY);
@@ -462,8 +588,8 @@ function setPollStatus(state) {
   if (expired) return;
   const [dot, label] =
     state === "retry"
-      ? ["bg-amber-400", "Reconnecting…"]
-      : ["bg-emerald-400 dot-live", "Auto-Refreshing"];
+      ? ["bg-amber-400", t("reconnecting")]
+      : ["bg-emerald-400 dot-live", t("auto_refreshing")];
   el.poll.innerHTML = `<span class="h-1.5 w-1.5 rounded-full ${dot}"></span> ${label}`;
 }
 
@@ -493,15 +619,20 @@ el.copy.addEventListener("click", actCopy);
 el.address.addEventListener("click", actCopy);
 el.new.addEventListener("click", actNew);
 el.refresh.addEventListener("click", actRefresh);
+if (el.lang)
+  el.lang.addEventListener("click", () =>
+    applyLang(LANG === "ar" ? "en" : "ar"),
+  );
 
 (async function main() {
+  applyLang(LANG); // Arabic-first (or the saved choice) before anything renders
   tickTimer = setInterval(tick, 1000);
   try {
     await resume();
     tick();
     startPolling();
   } catch (e) {
-    el.address.textContent = "Error";
-    toast("Failed To Create Mailbox: " + e.message);
+    el.address.textContent = t("error");
+    toast(t("create_fail") + e.message);
   }
 })();
