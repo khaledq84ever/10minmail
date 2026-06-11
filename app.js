@@ -295,9 +295,14 @@ async function poll() {
 
 async function openMessage(id) {
   openId = id;
+  // Mark read locally right away so the unread dot/bold clears instantly,
+  // instead of waiting for the next poll to reflect the server PATCH below.
+  const opened = messages.find((m) => m.id === id);
+  if (opened) opened.seen = true;
   el.reader.classList.remove("hidden");
   el.reader.innerHTML = `<div class="text-slate-500 text-sm">Loading…</div>`;
   renderInbox();
+  saveMsgs();
   try {
     let m;
     try {
@@ -364,6 +369,10 @@ function renderInbox() {
   // empty state — no tall dead space when the inbox is empty.
   el.box.style.display = messages.length ? "grid" : "none";
   el.empty.style.display = messages.length ? "none" : "block";
+  // Fill the otherwise-blank desktop reader pane with a hint until a message is opened.
+  if (messages.length && !openId) {
+    el.reader.innerHTML = `<div class="hidden md:flex h-full items-center justify-center text-slate-500 text-sm">Select a message to read it here</div>`;
+  }
   el.list.innerHTML = messages
     .map((m) => {
       const from = m.from?.address || "unknown";
