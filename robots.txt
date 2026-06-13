@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://10minmail-production.up.railway.app/sitemap.xml
